@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tarot Instan</title>
+<style>
+:root{--bg:#f6f1fb;--card:#fff;--tx:#2a1c3d;--mu:#6d5a85;--ac:#7b3fc4;--ac2:#c9a24a;--bd:#ddd0ee;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#150d24;--card:#241838;--tx:#f1e9fb;--mu:#b5a3cc;--ac:#a979f0;--ac2:#e0bd62;--bd:#3b2a58}}
+:root[data-theme="dark"]{--bg:#150d24;--card:#241838;--tx:#f1e9fb;--mu:#b5a3cc;--ac:#a979f0;--ac2:#e0bd62;--bd:#3b2a58}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:560px;margin:0 auto;padding:18px 16px 40px}
+h1{font:600 26px/1.2 Georgia,serif;text-align:center;margin:8px 0 2px;color:var(--ac2)}
+.sub{text-align:center;color:var(--mu);margin:0 0 18px}
+.box{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin:12px 0}
+h2{font:600 18px Georgia,serif;margin:0 0 8px}
+button,.btn{display:block;width:100%;background:var(--ac);color:#fff;border:0;border-radius:12px;padding:14px;font:600 16px inherit;margin:10px 0;text-align:center;cursor:pointer}
+button.alt{background:transparent;color:var(--ac);border:1px solid var(--ac)}
+button:disabled{opacity:.5}
+ol{padding-left:20px;margin:6px 0}li{margin:6px 0}
+.seg{display:flex;gap:8px}.seg button{margin:0;padding:10px}.seg button.on{background:var(--ac2);color:#2a1c3d}
+input[type=text],select{width:100%;padding:11px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font:inherit}
+.bar{height:10px;background:var(--bd);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--ac2)}
+.deck{height:90px;display:flex;justify-content:center;align-items:center}
+.deck b{width:46px;height:74px;border-radius:6px;background:linear-gradient(135deg,var(--ac),var(--ac2));border:2px solid var(--card);margin:0 -14px;display:block}
+.deck.go b{animation:sh .5s infinite alternate}.deck.go b:nth-child(2){animation-delay:.15s}.deck.go b:nth-child(3){animation-delay:.3s}
+@keyframes sh{from{transform:translateY(-12px) rotate(-8deg)}to{transform:translateY(12px) rotate(8deg)}}
+img.pv{width:100%;border-radius:12px;margin-top:8px}
+.pos{color:var(--ac2);font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+.rev{color:#d0527a;font-size:13px;font-weight:600}
+.hide{display:none}.mu{color:var(--mu);font-size:14px}
+</style>
+</head>
+<body>
+<main>
+<h1>🔮 Tarot Instan</h1>
+<p class="sub">Foto kartumu, refleksikan situasimu, temukan langkah nyata</p>
+
+<section id="s1">
+ <div class="box"><h2>Panduan Mengocok Kartu</h2>
+ <ol>
+  <li><b>Tenangkan diri.</b> Tarik napas dalam 3 kali, lalu rumuskan satu masalah atau situasi nyata yang sedang kamu hadapi.</li>
+  <li><b>Kocok.</b> Pegang dek dengan kedua tangan, kocok perlahan (cara tumpuk-geser atau tebar di meja lalu aduk) sampai terasa cukup, sekitar 30 detik.</li>
+  <li><b>Potong.</b> Bagi dek menjadi 3 tumpukan dengan tangan kiri, lalu susun ulang sesukamu.</li>
+  <li><b>Pilih.</b> Ambil kartu dari atas dek sesuai jumlah yang dipilih.</li>
+  <li><b>Tata.</b> Letakkan berjajar dari kiri ke kanan, satu baris, dalam posisi terbuka. Jangan tumpang tindih agar semua gambar terlihat.</li>
+  <li><b>Foto.</b> Pastikan cahaya cukup dan semua kartu masuk dalam satu foto.</li>
+ </ol>
+ <div class="deck" id="deck"><b></b><b></b><b></b></div>
+ <div class="bar"><i id="pb"></i></div>
+ <button class="alt" id="tm">Mulai timer kocok 30 detik</button></div>
+ <div class="box"><h2>Situasi / masalah yang dihadapi</h2><input type="text" id="q" placeholder="Misal: bingung memilih antara dua tawaran kerja">
+ <p class="mu">Jumlah kartu</p><div class="seg" id="n"><button data-n="1">1</button><button data-n="3" class="on">3</button><button data-n="5">5</button></div></div>
+ <div class="box"><h2>Kunci API Anthropic</h2><input type="password" id="ak" placeholder="sk-ant-..."><p class="mu">Disimpan hanya di perangkat ini. Dapatkan di console.anthropic.com.</p></div>
+ <button id="go">Lanjut ke Foto Kartu</button>
+</section>
+
+<section id="s2" class="hide">
+ <div class="box"><h2>Foto Kartu</h2><p class="mu" id="hint"></p>
+ <label class="btn" for="f">📷 Ambil / pilih foto</label>
+ <input type="file" id="f" accept="image/*" capture="environment" class="hide">
+ <img id="pv" class="pv hide" alt="Foto kartu">
+ <button id="an" class="hide">Baca Kartu</button><p id="st" class="mu"></p></div>
+ <button class="alt" id="b1">Kembali</button>
+</section>
+
+<section id="s3" class="hide">
+ <div id="res"></div>
+ <div class="box hide" id="sm"><h2>Rangkuman &amp; Langkah Praktis</h2><div id="smt"></div></div>
+ <button id="sbtn" class="hide">Buat rangkuman &amp; langkah praktis</button>
+ <button class="alt" id="again">Pembacaan baru</button>
+ <p class="mu">Pembacaan ini bersifat refleksi atas kondisi saat ini untuk membantu memecahkan masalah, bukan ramalan masa depan atau pengganti nasihat profesional.</p>
+</section>
+</main>
+<script>
+// ===== DATABASE ARTI KARTU =====
+var D={};
+var MA=[
+["The Fool","Si Bodoh","Awal baru, spontanitas, keberanian melangkah, polos","Gegabah, ragu, mengambil risiko tanpa pikir"],
+["The Magician","Sang Pesulap","Kemampuan, tekad, memanfaatkan sumber daya, manifestasi","Manipulasi, bakat tak terpakai, kurang fokus"],
+["The High Priestess","Pendeta Wanita","Intuisi, rahasia, kebijaksanaan batin, tenang","Mengabaikan intuisi, rahasia terbongkar, ragu pada diri"],
+["The Empress","Sang Permaisuri","Kesuburan, kasih sayang, kelimpahan, kreativitas","Ketergantungan, kreativitas buntu, terlalu memanjakan"],
+["The Emperor","Sang Kaisar","Otoritas, struktur, stabilitas, kepemimpinan","Kaku, otoriter, kurang disiplin"],
+["The Hierophant","Sang Pemuka","Tradisi, bimbingan, nilai bersama, institusi","Melawan aturan, dogma, mencari jalan sendiri"],
+["The Lovers","Sang Kekasih","Cinta, harmoni, pilihan penting, keselarasan nilai","Ketidakselarasan, keputusan sulit, hubungan renggang"],
+["The Chariot","Kereta Perang","Kemenangan, kendali diri, tekad, kemajuan","Kehilangan arah, agresif, kurang kendali"],
+["Strength","Kekuatan","Keberanian, kesabaran, welas asih, ketahanan batin","Ragu diri, lemah, emosi tak terkendali"],
+["The Hermit","Sang Pertapa","Introspeksi, menyendiri, mencari makna, bimbingan batin","Terlalu mengasingkan diri, kesepian, menolak refleksi"],
+["Wheel of Fortune","Roda Keberuntungan","Siklus, perubahan keadaan, titik balik, peluang","Kemunduran sementara, melawan perubahan"],
+["Justice","Keadilan","Keadilan, kebenaran, sebab-akibat, keputusan adil","Ketidakadilan, tak bertanggung jawab, bias"],
+["The Hanged Man","Orang Tergantung","Berhenti sejenak, sudut pandang baru, pelepasan, pengorbanan","Penundaan sia-sia, bertahan tanpa guna, enggan berubah"],
+["Death","Kematian","Akhir dan transformasi, melepas yang lama, babak baru","Menolak perubahan, terjebak masa lalu"],
+["Temperance","Keseimbangan","Moderasi, keseimbangan, kesabaran, harmoni","Berlebihan, tidak seimbang, tergesa-gesa"],
+["The Devil","Sang Iblis","Keterikatan, godaan, kecanduan, bayangan diri","Pembebasan, melepas belenggu, menyadari pola buruk"],
+["The Tower","Menara","Perubahan mendadak, runtuhnya yang rapuh, pencerahan","Menghindari bencana, takut berubah, keruntuhan tertunda"],
+["The Star","Bintang","Harapan, pembaruan, inspirasi, ketenangan","Putus asa, kehilangan keyakinan, terputus"],
+["The Moon","Bulan","Ilusi, rasa takut, bawah sadar, intuisi yang samar","Kebingungan mereda, kebenaran muncul, melepas takut"],
+["The Sun","Matahari","Kebahagiaan, kesuksesan, vitalitas, kejelasan","Optimisme berlebihan, kebahagiaan tertunda"],
+["Judgement","Penghakiman","Kebangkitan, evaluasi diri, panggilan hidup, pengampunan","Menyalahkan diri, ragu pada panggilan, menolak introspeksi"],
+["The World","Dunia","Penyelesaian, pencapaian, keutuhan, perjalanan tuntas","Belum tuntas, jalan pintas, hampir selesai"]];
+MA.forEach(function(c){D[c[0].toLowerCase()]={n:c[0],i:c[1],u:c[2],r:c[3],t:"Arkana Mayor"}});
+var S=[["Wands","Tongkat","semangat, kerja, ambisi, kreativitas"],["Cups","Piala","perasaan, hubungan, intuisi"],["Swords","Pedang","pikiran, konflik, keputusan, kebenaran"],["Pentacles","Koin","uang, karier, kesehatan, hal praktis"]];
+var NU=["awal baru, potensi, peluang","pilihan, dualitas, keseimbangan","pertumbuhan, kerja sama, ekspresi","stabilitas, fondasi, kemapanan","tantangan, perubahan, ketidakstabilan","harmoni, bantuan, transisi","evaluasi, godaan, ketekunan","gerak cepat, usaha, kemajuan","hampir tuntas, ketahanan, kemandirian","puncak, beban, penutupan siklus"];
+var NR=["peluang tertunda, belum siap","ragu, ketidakseimbangan, sulit memilih","hambatan, kurang kerja sama","kegelisahan, fondasi goyah","konflik mereda, menghindari tantangan","hambatan transisi, terpaku masa lalu","ragu, kurang usaha, menyerah","tergesa-gesa, hambatan, kemacetan","kelelahan, kurang percaya diri","beban berlebih, sulit menuntaskan"];
+var NM=["Ace","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten"];
+var CT=[["Page","Pelayan","kabar baru, rasa ingin tahu, murid yang bersemangat"],["Knight","Ksatria","aksi, pengejaran tujuan, gerakan"],["Queen","Ratu","kematangan, kepedulian, penguasaan emosional"],["King","Raja","kepemimpinan, otoritas, penguasaan penuh"]];
+S.forEach(function(s){
+ NM.forEach(function(m,k){D[(m+" of "+s[0]).toLowerCase()]={n:m+" of "+s[0],i:(k+1)+" "+s[1],t:"Arkana Minor - "+s[1],u:NU[k]+" (tema "+s[2]+")",r:NR[k]+" (tema "+s[2]+")"}});
+ CT.forEach(function(c){D[(c[0]+" of "+s[0]).toLowerCase()]={n:c[0]+" of "+s[0],i:c[1]+" "+s[1],t:"Arkana Minor - "+s[1],u:c[2]+" dalam hal "+s[2],r:"sisi gelap atau kurang matang dari "+c[2]+" ("+s[2]+")"}});
+});
+var POS={1:["Fokus yang perlu diperhatikan"],3:["Latar belakang situasi","Kondisi saat ini","Langkah yang bisa diambil"],5:["Situasi nyata","Hambatan utama","Akar masalah","Sumber daya yang dimiliki","Tindakan yang disarankan"]};
+
+// ===== APP =====
+var $=function(i){return document.getElementById(i)};
+var N=3,blob=null,cards=[];
+function show(i){["s1","s2","s3"].forEach(function(x){$(x).classList.toggle("hide",x!==i)});scrollTo(0,0)}
+document.querySelectorAll("#n button").forEach(function(b){b.onclick=function(){N=+b.dataset.n;document.querySelectorAll("#n button").forEach(function(x){x.classList.toggle("on",x===b)})}});
+$("tm").onclick=function(){var t=0,b=$("tm");b.disabled=true;$("deck").classList.add("go");
+ var iv=setInterval(function(){t++;$("pb").style.width=(t/30*100)+"%";b.textContent="Mengocok... "+(30-t)+" dtk";
+ if(t>=30){clearInterval(iv);$("deck").classList.remove("go");b.disabled=false;b.textContent="Selesai. Potong dek menjadi 3 tumpukan, lalu tata kartu.";}},1000)};
+$("go").onclick=function(){$("hint").textContent="Tata "+N+" kartu berjajar dari kiri ke kanan, lalu foto dari atas dengan cahaya terang.";show("s2")};
+$("b1").onclick=function(){show("s1")};
+$("again").onclick=function(){blob=null;$("pv").classList.add("hide");$("an").classList.add("hide");$("st").textContent="";show("s1")};
+
+function shrink(file){return new Promise(function(res,rej){var im=new Image();im.onload=function(){var m=1400,s=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=im.width*s;c.height=im.height*s;c.getContext("2d").drawImage(im,0,0,c.width,c.height);c.toBlob(function(b){b?res(b):rej()},"image/jpeg",.85)};im.onerror=rej;im.src=URL.createObjectURL(file)})}
+$("f").onchange=async function(e){var f=e.target.files[0];if(!f)return;
+ try{blob=await shrink(f)}catch(x){$("st").textContent="Foto tidak dapat dibaca.";return}
+ $("pv").src=URL.createObjectURL(blob);$("pv").classList.remove("hide");$("an").classList.remove("hide");$("st").textContent=""};
+
+var MODEL="claude-sonnet-5-5";
+$("ak").value=localStorage.getItem("ak")||"";
+$("ak").oninput=function(){localStorage.setItem("ak",$("ak").value.trim())};
+function b64(b){return new Promise(function(r){var f=new FileReader();f.onload=function(){r(f.result.split(",")[1])};f.readAsDataURL(b)})}
+async function AI(prompt,img,json){
+ var key=localStorage.getItem("ak");if(!key)throw new Error("nokey");
+ var c=[];if(img)c.push({type:"image",source:{type:"base64",media_type:"image/jpeg",data:await b64(img)}});
+ c.push({type:"text",text:prompt});
+ var r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:MODEL,max_tokens:1000,messages:[{role:"user",content:c}]})});
+ var d=await r.json();if(!r.ok)throw new Error(d.error&&d.error.message||"api");
+ var t=d.content.map(function(x){return x.text||""}).join("");
+ return json?JSON.parse(t.replace(/```json|```/g,"").trim()):{text:t};
+}
+var NAMES=Object.keys(D).map(function(k){return D[k].n}).join("; ");
+$("an").onclick=async function(){
+ $("an").disabled=true;$("st").textContent="Mengenali kartu...";
+ try{
+  var r=await AI("Foto ini berisi deretan kartu tarot (sekitar "+N+" kartu). Identifikasi tiap kartu dari kiri ke kanan (atau atas ke bawah jika tersusun vertikal). Gunakan HANYA nama baku Inggris dari daftar ini: "+NAMES+". Tentukan juga apakah kartu terbalik (reversed: gambar tampak terbalik). Balas hanya JSON array: [{\"name\":\"The Fool\",\"reversed\":false}]. Jika tidak yakin, tebak yang paling mirip.",blob,true);
+  cards=(Array.isArray(r)?r:[]).map(function(c){var d=D[String(c.name).toLowerCase()];return d?{k:d.n.toLowerCase(),rev:!!c.reversed}:null}).filter(Boolean);
+  if(!cards.length)throw new Error("empty");
+  render();show("s3");
+ }catch(x){
+  $("st").textContent="Pengenalan otomatis gagal (cek kunci API dan internet). Pilih kartu secara manual.";
+  cards=[];for(var i=0;i<N;i++)cards.push({k:"the fool",rev:false});render();show("s3");
+ }
+ $("an").disabled=false};
+
+function render(){
+ var p=POS[cards.length]||cards.map(function(_,i){return "Kartu "+(i+1)});var h="";
+ var opts=Object.keys(D).map(function(k){return '<option value="'+k+'">'+D[k].n+" - "+D[k].i+"</option>"}).join("");
+ cards.forEach(function(c,i){var d=D[c.k];
+  h+='<div class="box"><div class="pos">'+p[i]+'</div><h2>'+d.i+' <span class="mu">('+d.n+')</span></h2>'+
+  '<div class="mu">'+d.t+'</div>'+(c.rev?'<div class="rev">TERBALIK</div>':'')+
+  '<p>'+(c.rev?d.r:d.u)+'.</p>'+
+  '<select data-i="'+i+'" class="sel">'+opts+'</select>'+
+  '<label class="mu"><input type="checkbox" data-r="'+i+'"'+(c.rev?" checked":"")+'> Posisi terbalik</label></div>'});
+ $("res").innerHTML=h;
+ document.querySelectorAll(".sel").forEach(function(s){s.value=cards[s.dataset.i].k;s.onchange=function(){cards[s.dataset.i].k=s.value;render()}});
+ document.querySelectorAll("[data-r]").forEach(function(c){c.onchange=function(){cards[c.dataset.r].rev=c.checked;render()}});
+ $("sbtn").classList.remove("hide");$("sm").classList.add("hide");
+}
+$("sbtn").onclick=async function(){
+ var b=$("sbtn");b.disabled=true;b.textContent="Menyusun...";
+ try{var p=POS[cards.length]||[];
+  var t=cards.map(function(c,i){var d=D[c.k];return (p[i]||"Kartu "+(i+1))+": "+d.n+(c.rev?" (terbalik)":"")+" - "+(c.rev?d.r:d.u)}).join("\n");
+  var r=await AI("Kamu fasilitator refleksi yang memakai kartu tarot sebagai alat berpikir, BUKAN peramal. Situasi nyata pengguna: "+($("q").value||"(belum disebutkan, bahas secara umum)")+"\nKartu:\n"+t+"\nTulis dalam bahasa Indonesia: (1) satu paragraf pendek yang memaknai kartu sebagai gambaran kondisi, pola pikir, dan dinamika yang sedang terjadi saat ini; (2) 3 langkah konkret yang bisa dilakukan untuk menyelesaikan atau menyikapi masalah tersebut. Dilarang memprediksi atau menjanjikan kejadian di masa depan; gunakan bahasa seperti 'kartu ini mengajak kamu mempertimbangkan...'.",null,false);
+  $("smt").textContent=r.text;$("sm").classList.remove("hide");
+ }catch(x){$("smt").textContent="Rangkuman belum tersedia.";$("sm").classList.remove("hide")}
+ b.disabled=false;b.textContent="Buat rangkuman & langkah praktis"};
+</script>
+</body>
+</html>
